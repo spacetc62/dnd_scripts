@@ -1,6 +1,7 @@
 #!/opt/local/bin/ruby
 require 'rubygems'
 require 'random'
+require 'attack'
 
 RAND = Random::RNG.new(Time.now.to_i)
 def rand(max)
@@ -23,58 +24,83 @@ secondary_damage = STRENGTH + MAGICAL + LEVEL_DAMAGE_MODIFIER
 tertiary_damage = (STRENGTH * 0.5).floor + MAGICAL + LEVEL_DAMAGE_MODIFIER
 
 
+# what could an attack consist of?
+#  weapon
+#  XdY+Z
+#  sneak attack?
+#  power attack
+#  vital strike
 
-attacks = [
-           { 
-             :name => "Bite",
-             :attack_mod => primary_attack,
-             :damage_mod => primary_damage,
-             :damage_roll => [6,6],
-             :pow_damage_mod => 9
-           },
-           { 
-             :name => "Claw 1",
-             :attack_mod => primary_attack,
-             :damage_mod => secondary_damage,
-             :damage_roll => [8],
-             :pow_damage_mod => 6
-           },
-           { 
-             :name => "Claw 2",
-             :attack_mod => primary_attack,
-             :damage_mod => secondary_damage,
-             :damage_roll => [8],
-             :pow_damage_mod => 6
-           },
-           { 
-             :name => "Wing 1",
-             :attack_mod => secondary_attack,
-             :damage_mod => tertiary_damage,
-             :damage_roll => [6],
-             :pow_damage_mod => 3
-           },
-           { 
-             :name => "Wing 2",
-             :attack_mod => secondary_attack,
-             :damage_mod => tertiary_damage,
-             :damage_roll => [6],
-             :pow_damage_mod => 3
-           },
-           { 
-             :name => "Tail",
-             :attack_mod => secondary_attack,
-             :damage_mod => primary_damage,
-             :damage_roll => [8],
-             :pow_damage_mod => 6
-           },
-           {
-             :name => "Electrcity",
-             :attack_mod => 0,
-             :damage_mod => 0,
-             :damage_roll => [8,8,8,8,8,8,8],
-             :pow_damage_mod => 0
-           }
-          ]
+# things that can affect stuff (equipment, feats, etc.) should subscribe to it
+#  amulet of mighty fists subscribes to my character's attacks with a hook for the appropriate modification
+#  the hook can either be a number to modify by (amulet of mighty fists)
+#  or a lambda that'll be passed the object it subscribed to (power attack: bad example because it's only a round, maybe we just pass this into the attack instance)
+#  what about things that can be turned on and off, like power attack?  how do we want to store that?
+#   maybe they subscribe, but things can be active or inactive as well and only the active things affect stuff?
+
+
+# attack bonus (melee) = BAB + STR modifier + size modifier (-1 for large)   pg179
+# damage (melee) = STR modifier + (1.5 mult for primary natural, 0.5 for 'secondary' [tertiary for me])
+#   primary is determined by only having one attack of that type (claws don't work)
+
+# how to group attacks?
+#   claws are one group
+#   wings are one group
+
+teeth = Weapon.new({
+                     :name => "Teeth",
+                     :die_count => 2,
+                     :die => 6,
+                   })
+
+claw = Weapon.new({
+                    :name => "Claw",
+                    :die_count => 1,
+                    :die => 8,
+                  })
+
+wing = Weapon.new({
+                    :name => "Wing",
+                    :die_count => 1,
+                    :die => 6,
+                  })
+
+tail = Weapon.new({
+                    :name => "Tail",
+                    :die_count => 1,
+                    :die => 8,
+                  })
+
+electricity = Weapon.new({
+                           :name => "Electricity",
+                           :die_count => 7,
+                           :die => 8,
+                         })
+
+new_attacks = [
+               Attack.new(:weapon => teeth,
+                          :attack_mod => primary_attack,
+                          :damage_mod => primary_damage),
+               Attack.new(:weapon => claw,
+                          :attack_mod => primary_attack,
+                          :damage_mod => secondary_damage),
+               Attack.new(:weapon => claw,
+                          :attack_mod => primary_attack,
+                          :damage_mod => secondary_damage),
+               Attack.new(:weapon => wing,
+                          :attack_mod => secondary_attack,
+                          :damage_mod => tertiary_damage),
+               Attack.new(:weapon => wing,
+                          :attack_mod => secondary_attack,
+                          :damage_mod => tertiary_damage),
+               Attack.new(:weapon => tail,
+                          :attack_mod => secondary_attack,
+                          :damage_mod => primary_damage),
+               Attack.new(:weapon => electricity,
+                          :attack_mod => 0,
+                          :damage_mod => 0),
+              ]
+
 
 def pretty_print_die_roll(die_array)
   hash = die_array.inject({}) do |hash, die|
@@ -88,35 +114,10 @@ end
 # puts pretty_print_die_roll([6, 6, 6, 8, 8])
 # exit 0
 
-def roll_damage(attack, damage_modifier, is_vital)
-  rolls = attack[:damage_roll].map{ |die| rand(die) }
-  rolls += attack[:damage_roll].map{ |die| rand(die) } if is_vital
-  total = rolls.inject(0){ |a,r| a+r } + damage_modifier
-  
-#   rolls.join("/") + " -> #{total}"
-  "#{total} = (#{pretty_print_die_roll(attack[:damage_roll])} + #{damage_modifier}) = #{rolls.join("/")} + #{damage_modifier}"
-end
-
-def roll_attack(attack, extra_attack_mod, extra_damage_mod, is_power, is_vital)
-  damage_mod = attack[:damage_mod] + extra_damage_mod + (is_power ? attack[:pow_damage_mod] : 0)
-  attack_mod = attack[:attack_mod] + extra_attack_mod + (is_power ? POWER_ATTACK_MOD : 0)
-  
-  attack_roll = rand(20)
-  puts ""
-  puts "Attacking with #{attack[:name]}"
-#   puts "Attack: #{attack_roll} -> #{attack_roll + attack_mod}  \tDamage: #{roll_damage(attack, damage_mod, is_vital)}"
-  puts "Attack: #{attack_roll + attack_mod} = (1d20+#{attack_mod}) = #{attack_roll} + #{attack_mod}   \tDamage: #{roll_damage(attack, damage_mod, is_vital)}"
-  if attack_roll == 20
-    puts "Possible Crit, Rolling Secondary:"
-    attack_roll = rand(20)
-#     puts "Attack: #{attack_roll} -> #{attack_roll + attack_mod}  \tDamage: #{roll_damage(attack, damage_mod, is_vital)}"
-    puts "Attack: #{attack_roll + attack_mod} = (1d20+#{attack_mod}) = #{attack_roll} + #{attack_mod}   \tDamage: #{roll_damage(attack, damage_mod, is_vital)}"
-  end
-end
-
 $stdout << "Breath Weapon? [y/N]: "
 if($stdin.readline.chomp.downcase == "y")
-  puts "Damage: " + roll_damage(attacks[6], 0, false)
+#   puts "Damage: " + roll_damage(attacks[6], 0, false)
+  puts "Damage: " + new_attacks[6].roll_damage(0, false)
   exit 0
 end
 
@@ -134,11 +135,11 @@ is_power = $stdin.readline.chomp.downcase == "y"
 
 $stdout << "Vital Strike? [y/N]: "
 if $stdin.readline.chomp.downcase == "y"
-  roll_attack(attacks[0], extra_attack_mod, extra_damage_mod, is_power, true)
+  new_attacks[0].roll_attack(extra_attack_mod, extra_damage_mod, is_power, true)
   exit 0
 end
 
 $stdout << "Dragon Form? [Y/n]: "
 ($stdin.readline.chomp.downcase == "n" ? 0..2 : 0..5).each do |i|
-  roll_attack(attacks[i], extra_attack_mod, extra_damage_mod, is_power, false)
+  new_attacks[i].roll_attack(extra_attack_mod, extra_damage_mod, is_power, false)
 end
