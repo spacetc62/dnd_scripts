@@ -121,7 +121,6 @@ attack_groups = [
                  breath_weapon_attack_group,
                 ]
 
-new_attacks = full_action_attack_group.attacks + breath_weapon_attack_group.attacks
               
 
 
@@ -140,7 +139,8 @@ end
 $stdout << "Breath Weapon? [y/N]: "
 if($stdin.readline.chomp.downcase == "y")
 #   puts "Damage: " + roll_damage(attacks[6], 0, false)
-  puts "Damage: " + new_attacks[6].roll_damage(0, false)
+#   puts "Damage: " + new_attacks[6].roll_damage(0, false)
+  puts "Damage: " + breath_weapon_attack_group.attacks.first.roll_damage(0, false)
   exit 0
 end
 
@@ -158,11 +158,18 @@ is_power = $stdin.readline.chomp.downcase == "y"
 
 $stdout << "Vital Strike? [y/N]: "
 if $stdin.readline.chomp.downcase == "y"
-  new_attacks[0].roll_attack(extra_attack_mod, extra_damage_mod, is_power, true)
+  standard_action_attack_group.attacks.first.roll_attack(extra_attack_mod, extra_damage_mod, is_power, true)
   exit 0
 end
 
-$stdout << "Dragon Form? [Y/n]: "
-($stdin.readline.chomp.downcase == "n" ? 0..2 : 0..5).each do |i|
-  new_attacks[i].roll_attack(extra_attack_mod, extra_damage_mod, is_power, false)
+$stdout << "Dragon Form (full round action)? [Y/n]: "
+if $stdin.readline.chomp.downcase == "n"
+  standard_action_attack_group.attacks.each do |attack|
+    attack.roll_attack(extra_attack_mod, extra_damage_mod, is_power, false)
+  end
+else
+  full_action_attack_group.attacks.each do |attack|
+    attack.roll_attack(extra_attack_mod, extra_damage_mod, is_power, false)
+  end
 end
+
