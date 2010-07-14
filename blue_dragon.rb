@@ -47,6 +47,13 @@ tertiary_damage = (STRENGTH * 0.5).floor + MAGICAL + LEVEL_DAMAGE_MODIFIER
 #   claws are one group
 #   wings are one group
 
+# naming?
+#   "full attack" (this is a full round attack)
+#     what do we call the things that make up a full round attack?
+#       how to group the claws?
+#   "attack" (standard action)
+#   so what do we call the lowest level thing? (ie bite)
+
 teeth = Weapon.new({
                      :name => "Teeth",
                      :die_count => 2,
