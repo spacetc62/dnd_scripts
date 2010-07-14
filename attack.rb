@@ -38,6 +38,14 @@ class Attack
   end
 end
 
+class AttackGroup
+  attr_accessor :name, :attacks
+  def initialize(options)
+    @name = options[:name]
+    @attacks = options[:attacks]
+  end
+end
+
 # class Character
 #   def initialize(options)
 #     @bab = options[:bab]

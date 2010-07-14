@@ -77,29 +77,52 @@ electricity = Weapon.new({
                            :die => 8,
                          })
 
-new_attacks = [
-               Attack.new(:weapon => teeth,
-                          :attack_mod => primary_attack,
-                          :damage_mod => primary_damage),
-               Attack.new(:weapon => claw,
-                          :attack_mod => primary_attack,
-                          :damage_mod => secondary_damage),
-               Attack.new(:weapon => claw,
-                          :attack_mod => primary_attack,
-                          :damage_mod => secondary_damage),
-               Attack.new(:weapon => wing,
-                          :attack_mod => secondary_attack,
-                          :damage_mod => tertiary_damage),
-               Attack.new(:weapon => wing,
-                          :attack_mod => secondary_attack,
-                          :damage_mod => tertiary_damage),
-               Attack.new(:weapon => tail,
-                          :attack_mod => secondary_attack,
-                          :damage_mod => primary_damage),
-               Attack.new(:weapon => electricity,
-                          :attack_mod => 0,
-                          :damage_mod => 0),
-              ]
+
+standard_action_attack_group =
+  AttackGroup.new(:name => "Standard action attack",
+                  :attacks => [
+                               Attack.new(:weapon => teeth,
+                                          :attack_mod => primary_attack,
+                                          :damage_mod => primary_damage),
+                               Attack.new(:weapon => claw,
+                                          :attack_mod => primary_attack,
+                                          :damage_mod => secondary_damage),
+                               Attack.new(:weapon => claw,
+                                          :attack_mod => primary_attack,
+                                          :damage_mod => secondary_damage),
+                              ])
+
+full_action_attack_group = 
+  AttackGroup.new(:name => "Full action attack",
+                  :attacks => standard_action_attack_group.attacks + [
+                                                              Attack.new(:weapon => wing,
+                                                                         :attack_mod => secondary_attack,
+                                                                         :damage_mod => tertiary_damage),
+                                                              Attack.new(:weapon => wing,
+                                                                         :attack_mod => secondary_attack,
+                                                                         :damage_mod => tertiary_damage),
+                                                              Attack.new(:weapon => tail,
+                                                                         :attack_mod => secondary_attack,
+                                                                         :damage_mod => primary_damage),
+                                                             ])
+
+breath_weapon_attack_group = 
+  AttackGroup.new(:name => "Breath weapon attack",
+                  :attacks => [
+                               Attack.new(:weapon => electricity,
+                                          :attack_mod => 0,
+                                          :damage_mod => 0),
+                              ])
+
+
+attack_groups = [
+                 standard_action_attack_group,
+                 full_action_attack_group,
+                 breath_weapon_attack_group,
+                ]
+
+new_attacks = full_action_attack_group.attacks + breath_weapon_attack_group.attacks
+              
 
 
 def pretty_print_die_roll(die_array)
