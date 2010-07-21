@@ -58,9 +58,6 @@ character = Character.new({
                             :name         => "Xanion",
                             :bab          => BAB,
                             :strength     => STRENGTH,
-#                             :actions      => actions,
-#                             :attack_bonus => extra_attack_mod,
-#                             :damage_bonus => extra_damage_mod,
                             :active_feats => [],
                           })
 
