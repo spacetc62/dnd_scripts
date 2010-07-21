@@ -13,7 +13,7 @@ STRENGTH = 5 - 1 # STR drain
 MULTIATTACK = 3
 MAGICAL = 2
 BARD = 3
-POWER_ATTACK_MOD = -1 - (BAB/4.0).floor
+# POWER_ATTACK_MOD = -1 - (BAB/4.0).floor
 
 LEVEL_DAMAGE_MODIFIER = 5
 
@@ -111,8 +111,7 @@ standard_action_attack_action =
                                                                           :character => character,
                                                                           :weapon => teeth,
                                                                           :attack_mod => primary_attack,
-                                                                          :damage_mod => primary_damage,
-                                                                          :pow_damage_mod => 9
+                                                                          :damage_mod => primary_damage
                                                                         }),
                                                        ]}),
                         ],
@@ -130,33 +129,27 @@ full_action_attack_action =
                                                         MeleeAttack.new(:character => character,
                                                                         :weapon => teeth,
                                                                         :attack_mod => primary_attack,
-                                                                        :damage_mod => primary_damage,
-                                                                        :pow_damage_mod => 9),
+                                                                        :damage_mod => primary_damage),
                                                         MeleeAttack.new(:character => character,
                                                                         :weapon => claw,
                                                                         :attack_mod => primary_attack,
-                                                                        :damage_mod => secondary_damage,
-                                                                        :pow_damage_mod => 6),
+                                                                        :damage_mod => secondary_damage),
                                                         MeleeAttack.new(:character => character,
                                                                         :weapon => claw,
                                                                         :attack_mod => primary_attack,
-                                                                        :damage_mod => secondary_damage,
-                                                                        :pow_damage_mod => 6),
+                                                                        :damage_mod => secondary_damage),
                                                         MeleeAttack.new(:character => character,
                                                                         :weapon => wing,
                                                                         :attack_mod => secondary_attack,
-                                                                        :damage_mod => tertiary_damage,
-                                                                        :pow_damage_mod => 3),
+                                                                        :damage_mod => tertiary_damage),
                                                         MeleeAttack.new(:character => character,
                                                                         :weapon => wing,
                                                                         :attack_mod => secondary_attack,
-                                                                        :damage_mod => tertiary_damage,
-                                                                        :pow_damage_mod => 3),
+                                                                        :damage_mod => tertiary_damage),
                                                         MeleeAttack.new(:character => character,
                                                                         :weapon => tail,
                                                                         :attack_mod => secondary_attack,
-                                                                        :damage_mod => primary_damage,
-                                                                        :pow_damage_mod => 6),
+                                                                        :damage_mod => primary_damage),
                                                        ]})
                          ],
              })
