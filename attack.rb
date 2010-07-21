@@ -89,7 +89,6 @@ class Character
     @name = options[:name]
     @bab = options[:bab]
     @strength = options[:stregth]
-#     @attack_modifiers = options[:attack_modifiers]
     @actions = options[:actions]
     @attack_bonus = options[:attack_bonus]
     @damage_bonus = options[:damage_bonus]
@@ -103,7 +102,6 @@ class Weapon
     @name = options[:name]
     @die = options[:die]
     @die_count = options[:die_count]
-#     @damage_modifier = options
     @strength_multiplier = options[:strength_multiplier] || 1
   end
   
