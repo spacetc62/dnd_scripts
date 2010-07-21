@@ -1,11 +1,8 @@
 class Attack
   def initialize(options)
-#     @name = options[:name]
-#     @character = options[:character]
     @weapon = options[:weapon]
     @attack_mod = options[:attack_mod]
     @damage_mod = options[:damage_mod]
-#     @damage_roll = options[:damage_roll]
     @character = options[:character]
   end
   
@@ -13,14 +10,13 @@ class Attack
     raise "override in specific attack class"
   end
 
-  def roll_damage(damage_modifier, is_vital = nil)
+  def roll_damage(damage_modifier)
     is_vital = @character.active_feats.include?(:vital_strike)
     
     rolls = @weapon.damage_roll
     rolls += @weapon.damage_roll if is_vital
     total = rolls.inject(0){ |a,r| a+r } + damage_modifier
     
-    #   rolls.join("/") + " -> #{total}"
     "#{total} = (#{@weapon.pretty_print_die_roll} + #{damage_modifier}) = #{rolls.join("/")} + #{damage_modifier}"
   end
 end
@@ -30,14 +26,11 @@ class MeleeAttack < Attack
     roll_attack
   end
   
-  def roll_attack # (extra_attack_mod, extra_damage_mod, is_power, is_vital)
+  def roll_attack
     extra_attack_mod = @character.attack_bonus
     extra_damage_mod = @character.damage_bonus
     is_power = @character.active_feats.include?(:power_attack)
-    is_vital = @character.active_feats.include?(:vital_strike)
 
-    power_attack_mod = POWER_ATTACK_MOD
-    
     pow_damage_mod = 2 + ( (@character.bab / 4.0).floor * 2 )
     pow_damage_mod = ( pow_damage_mod * @weapon.strength_multiplier ).floor
     power_attack_mod = -1 - (@character.bab / 4.0).floor
@@ -48,13 +41,11 @@ class MeleeAttack < Attack
     attack_roll = rand(20)
     puts ""
     puts "Attacking with #{@weapon.name}"
-    #   puts "Attack: #{attack_roll} -> #{attack_roll + attack_mod}  \tDamage: #{roll_damage(attack, damage_mod, is_vital)}"
-    puts "Attack: #{attack_roll + attack_mod} = (1d20+#{attack_mod}) = #{attack_roll} + #{attack_mod}   \tDamage: #{roll_damage(damage_mod, is_vital)}"
+    puts "Attack: #{attack_roll + attack_mod} = (1d20+#{attack_mod}) = #{attack_roll} + #{attack_mod}   \tDamage: #{roll_damage(damage_mod)}"
     if attack_roll == 20
       puts "Possible Crit, Rolling Secondary:"
       attack_roll = rand(20)
-      #     puts "Attack: #{attack_roll} -> #{attack_roll + attack_mod}  \tDamage: #{roll_damage(attack, damage_mod, is_vital)}"
-      puts "Attack: #{attack_roll + attack_mod} = (1d20+#{attack_mod}) = #{attack_roll} + #{attack_mod}   \tDamage: #{roll_damage(damage_mod, is_vital)}"
+      puts "Attack: #{attack_roll + attack_mod} = (1d20+#{attack_mod}) = #{attack_roll} + #{attack_mod}   \tDamage: #{roll_damage(damage_mod)}"
     end
     
   end

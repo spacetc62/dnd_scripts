@@ -194,10 +194,7 @@ end
 
 $stdout << "Breath Weapon? [y/N]: "
 if($stdin.readline.chomp.downcase == "y")
-#   puts "Damage: " + roll_damage(attacks[6], 0, false)
-#   puts "Damage: " + new_attacks[6].roll_damage(0, false)
-  puts "Damage: " + # breath_weapon_attack_group.attacks.first.roll_damage(0, false)
-    character.actions.detect {|a| a.name == "breath weapon attack" }.run.flatten.first
+  puts "Damage: " + character.actions.detect {|a| a.name == "breath weapon attack" }.run.flatten.first
   exit 0
 end
 
@@ -222,22 +219,14 @@ character.active_feats << :power_attack if is_power
 $stdout << "Vital Strike? [y/N]: "
 if $stdin.readline.chomp.downcase == "y"
   character.active_feats << :vital_strike
-#   standard_action_attack_group.attacks.first.roll_attack(extra_attack_mod, extra_damage_mod, is_power, true)
-#   character.active_feats << :vital_strike
   character.actions.detect {|a| a.name == "standard action attack" }.run
   exit 0
 end
 
 # $stdout << "Dragon Form (full round action)? [Y/n]: "
 # if $stdin.readline.chomp.downcase == "n"
-# #   standard_action_attack_group.attacks.each do |attack|
-# #     attack.roll_attack(extra_attack_mod, extra_damage_mod, is_power, false)
-# #   end
 #   character.actions.detect {|a| a.name == "standard action attack" }.run
 # else
-# #   full_action_attack_group.attacks.each do |attack|
-# #     attack.roll_attack(extra_attack_mod, extra_damage_mod, is_power, false)
-# #   end
   character.actions.detect {|a| a.name == "full action attack" }.run
 # end
 
