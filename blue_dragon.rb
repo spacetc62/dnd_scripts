@@ -68,6 +68,7 @@ teeth = Weapon.new({
                      :name => "Teeth",
                      :die_count => 2,
                      :die => 6,
+                     :strength_multiplier => 1.5,
                    })
 
 claw = Weapon.new({
@@ -80,12 +81,14 @@ wing = Weapon.new({
                     :name => "Wing",
                     :die_count => 1,
                     :die => 6,
+                    :strength_multiplier => 0.5,
                   })
 
 tail = Weapon.new({
                     :name => "Tail",
                     :die_count => 1,
                     :die => 8,
+                    :strength_multiplier => 1.5,
                   })
 
 electricity = Weapon.new({

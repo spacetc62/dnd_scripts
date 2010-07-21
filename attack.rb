@@ -6,7 +6,6 @@ class Attack
     @attack_mod = options[:attack_mod]
     @damage_mod = options[:damage_mod]
 #     @damage_roll = options[:damage_roll]
-    @pow_damage_mod = options[:pow_damage_mod]
     @character = options[:character]
   end
   
@@ -36,9 +35,15 @@ class MeleeAttack < Attack
     extra_damage_mod = @character.damage_bonus
     is_power = @character.active_feats.include?(:power_attack)
     is_vital = @character.active_feats.include?(:vital_strike)
+
+    power_attack_mod = POWER_ATTACK_MOD
     
-    damage_mod = @damage_mod + extra_damage_mod + (is_power ? @pow_damage_mod : 0)
-    attack_mod = @attack_mod + extra_attack_mod + (is_power ? POWER_ATTACK_MOD : 0)
+    pow_damage_mod = 2 + ( (@character.bab / 4.0).floor * 2 )
+    pow_damage_mod = ( pow_damage_mod * @weapon.strength_multiplier ).floor
+    power_attack_mod = -1 - (@character.bab / 4.0).floor
+    
+    damage_mod = @damage_mod + extra_damage_mod + (is_power ? pow_damage_mod : 0)
+    attack_mod = @attack_mod + extra_attack_mod + (is_power ? power_attack_mod : 0)
     
     attack_roll = rand(20)
     puts ""
@@ -88,7 +93,7 @@ class AttackGroup
 end
 
 class Character
-  attr_accessor :actions, :active_feats, :attack_bonus, :damage_bonus
+  attr_accessor :actions, :active_feats, :attack_bonus, :damage_bonus, :bab
   def initialize(options)
     @name = options[:name]
     @bab = options[:bab]
@@ -102,12 +107,13 @@ class Character
 end
 
 class Weapon
-  attr_reader :name, :die, :die_count
+  attr_reader :name, :die, :die_count, :strength_multiplier
   def initialize(options)
     @name = options[:name]
     @die = options[:die]
     @die_count = options[:die_count]
 #     @damage_modifier = options
+    @strength_multiplier = options[:strength_multiplier] || 1
   end
   
   def pretty_print_die_roll
