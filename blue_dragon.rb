@@ -9,7 +9,7 @@ def rand(max)
 end
 
 BAB = 12
-STRENGTH = 5
+STRENGTH = 5 - 1 # STR drain
 MULTIATTACK = 3
 MAGICAL = 2
 BARD = 3
@@ -48,11 +48,21 @@ tertiary_damage = (STRENGTH * 0.5).floor + MAGICAL + LEVEL_DAMAGE_MODIFIER
 #   wings are one group
 
 # naming?
-#   "full attack" (this is a full round attack)
-#     what do we call the things that make up a full round attack?
+#   "full attack" (this is a full round attack) [full round attack]
+#     what do we call the things that make up a full round attack? [attack group]
 #       how to group the claws?
-#   "attack" (standard action)
-#   so what do we call the lowest level thing? (ie bite)
+#   "attack" (standard action) [standard attack?]
+#   so what do we call the lowest level thing? (ie bite) [attack?]
+
+character = Character.new({
+                            :name         => "Xanion",
+                            :bab          => BAB,
+                            :strength     => STRENGTH,
+#                             :actions      => actions,
+#                             :attack_bonus => extra_attack_mod,
+#                             :damage_bonus => extra_damage_mod,
+                            :active_feats => [],
+                          })
 
 teeth = Weapon.new({
                      :name => "Teeth",
@@ -85,50 +95,93 @@ electricity = Weapon.new({
                          })
 
 
-standard_action_attack_group =
-  AttackGroup.new(:name => "Standard action attack",
-                  :attacks => [
-                               Attack.new(:weapon => teeth,
-                                          :attack_mod => primary_attack,
-                                          :damage_mod => primary_damage),
-                               Attack.new(:weapon => claw,
-                                          :attack_mod => primary_attack,
-                                          :damage_mod => secondary_damage),
-                               Attack.new(:weapon => claw,
-                                          :attack_mod => primary_attack,
-                                          :damage_mod => secondary_damage),
-                              ])
+standard_action_attack_action =
+  Action.new({
+               :character => character,
+               :name => "standard action attack",
+               :acts => [
+                         AttackGroup.new({
+                                           :character => character,
+                                           :name => "Standard action attack",
+                                           :attacks => [
+                                                        MeleeAttack.new({
+                                                                          :character => character,
+                                                                          :weapon => teeth,
+                                                                          :attack_mod => primary_attack,
+                                                                          :damage_mod => primary_damage,
+                                                                          :pow_damage_mod => 9
+                                                                        }),
+                                                       ]}),
+                        ],
+             })
 
-full_action_attack_group = 
-  AttackGroup.new(:name => "Full action attack",
-                  :attacks => standard_action_attack_group.attacks + [
-                                                              Attack.new(:weapon => wing,
-                                                                         :attack_mod => secondary_attack,
-                                                                         :damage_mod => tertiary_damage),
-                                                              Attack.new(:weapon => wing,
-                                                                         :attack_mod => secondary_attack,
-                                                                         :damage_mod => tertiary_damage),
-                                                              Attack.new(:weapon => tail,
-                                                                         :attack_mod => secondary_attack,
-                                                                         :damage_mod => primary_damage),
-                                                             ])
+full_action_attack_action = 
+  Action.new({
+               :character => character,
+               :name => "full action attack",
+               :acts => [
+                         AttackGroup.new({
+                                           :character => character,
+                                           :name => "Full action attack",
+                                           :attacks => [
+                                                        MeleeAttack.new(:character => character,
+                                                                        :weapon => teeth,
+                                                                        :attack_mod => primary_attack,
+                                                                        :damage_mod => primary_damage,
+                                                                        :pow_damage_mod => 9),
+                                                        MeleeAttack.new(:character => character,
+                                                                        :weapon => claw,
+                                                                        :attack_mod => primary_attack,
+                                                                        :damage_mod => secondary_damage,
+                                                                        :pow_damage_mod => 6),
+                                                        MeleeAttack.new(:character => character,
+                                                                        :weapon => claw,
+                                                                        :attack_mod => primary_attack,
+                                                                        :damage_mod => secondary_damage,
+                                                                        :pow_damage_mod => 6),
+                                                        MeleeAttack.new(:character => character,
+                                                                        :weapon => wing,
+                                                                        :attack_mod => secondary_attack,
+                                                                        :damage_mod => tertiary_damage,
+                                                                        :pow_damage_mod => 3),
+                                                        MeleeAttack.new(:character => character,
+                                                                        :weapon => wing,
+                                                                        :attack_mod => secondary_attack,
+                                                                        :damage_mod => tertiary_damage,
+                                                                        :pow_damage_mod => 3),
+                                                        MeleeAttack.new(:character => character,
+                                                                        :weapon => tail,
+                                                                        :attack_mod => secondary_attack,
+                                                                        :damage_mod => primary_damage,
+                                                                        :pow_damage_mod => 6),
+                                                       ]})
+                         ],
+             })
 
-breath_weapon_attack_group = 
-  AttackGroup.new(:name => "Breath weapon attack",
-                  :attacks => [
-                               Attack.new(:weapon => electricity,
-                                          :attack_mod => 0,
-                                          :damage_mod => 0),
-                              ])
+breath_weapon_attack_action = 
+  Action.new({
+               :character => character,
+               :name => "breath weapon attack",
+               :acts => [
+                         AttackGroup.new(:character => character,
+                                         :name => "Breath weapon attack",
+                                         :attacks => [
+                                                      SupernaturalAttack.new(:character => character,
+                                                                             :weapon => electricity,
+                                                                             :attack_mod => 0,
+                                                                             :damage_mod => 0),
+                                                     ])
+                        ],
+             })
 
 
-attack_groups = [
-                 standard_action_attack_group,
-                 full_action_attack_group,
-                 breath_weapon_attack_group,
-                ]
+actions = [
+           standard_action_attack_action,
+           full_action_attack_action,
+           breath_weapon_attack_action,
+          ]
 
-              
+character.actions = actions              
 
 
 def pretty_print_die_roll(die_array)
@@ -147,7 +200,8 @@ $stdout << "Breath Weapon? [y/N]: "
 if($stdin.readline.chomp.downcase == "y")
 #   puts "Damage: " + roll_damage(attacks[6], 0, false)
 #   puts "Damage: " + new_attacks[6].roll_damage(0, false)
-  puts "Damage: " + breath_weapon_attack_group.attacks.first.roll_damage(0, false)
+  puts "Damage: " + # breath_weapon_attack_group.attacks.first.roll_damage(0, false)
+    character.actions.detect {|a| a.name == "breath weapon attack" }.run.flatten.first
   exit 0
 end
 
@@ -163,20 +217,31 @@ extra_damage_mod = $stdin.readline.chomp.to_i + bard_mod
 $stdout << "Power Attack? [y/N]: "
 is_power = $stdin.readline.chomp.downcase == "y"
 
+character.attack_bonus = extra_attack_mod
+character.damage_bonus = extra_damage_mod
+character.active_feats << :power_attack if is_power
+
+
+
 $stdout << "Vital Strike? [y/N]: "
 if $stdin.readline.chomp.downcase == "y"
-  standard_action_attack_group.attacks.first.roll_attack(extra_attack_mod, extra_damage_mod, is_power, true)
+  character.active_feats << :vital_strike
+#   standard_action_attack_group.attacks.first.roll_attack(extra_attack_mod, extra_damage_mod, is_power, true)
+#   character.active_feats << :vital_strike
+  character.actions.detect {|a| a.name == "standard action attack" }.run
   exit 0
 end
 
-$stdout << "Dragon Form (full round action)? [Y/n]: "
-if $stdin.readline.chomp.downcase == "n"
-  standard_action_attack_group.attacks.each do |attack|
-    attack.roll_attack(extra_attack_mod, extra_damage_mod, is_power, false)
-  end
-else
-  full_action_attack_group.attacks.each do |attack|
-    attack.roll_attack(extra_attack_mod, extra_damage_mod, is_power, false)
-  end
-end
+# $stdout << "Dragon Form (full round action)? [Y/n]: "
+# if $stdin.readline.chomp.downcase == "n"
+# #   standard_action_attack_group.attacks.each do |attack|
+# #     attack.roll_attack(extra_attack_mod, extra_damage_mod, is_power, false)
+# #   end
+#   character.actions.detect {|a| a.name == "standard action attack" }.run
+# else
+# #   full_action_attack_group.attacks.each do |attack|
+# #     attack.roll_attack(extra_attack_mod, extra_damage_mod, is_power, false)
+# #   end
+  character.actions.detect {|a| a.name == "full action attack" }.run
+# end
 
