@@ -1,30 +1,62 @@
 class Attack
-  attr_accessor :weapon, :character
+  attr_accessor :weapon, :character, :damage_rolls, :extra_damage_guide_rolls
   def initialize(options)
     @weapon = options[:weapon]
     @attack_mod = options[:attack_mod]
     @damage_mod = options[:damage_mod]
     @character = options[:character]
+    
+    @extra_damage_guide_rolls = []
+    @extra_damage_guide_mods = []
   end
   
   def run
     raise "override in specific attack class"
   end
 
-  def roll_damage(damage_modifier)
-    is_vital = @character.active_feats.include?(:vital_strike)
-    
-    rolls = @weapon.damage_roll
-    rolls += @weapon.damage_roll if is_vital
-    total = rolls.inject(0){ |a,r| a+r } + damage_modifier
-    
-    "#{total} = (#{@weapon.pretty_print_die_roll} + #{damage_modifier}) = #{rolls.join("/")} + #{damage_modifier}"
+  def pretty_damage
+    "#{total_damage} = (#{pretty_damage_guide}) = #{pretty_damage_actual}"
+  end
+  
+  def pretty_damage_guide
+    (base_damage_guide_rolls + @extra_damage_guide_rolls + base_damage_guide_mods + @extra_damage_guide_mods).map {|g| g.to_s}.join(" + ")
+  end
+  
+  def base_damage_guide_rolls
+    [@weapon.pretty_print_die_roll]
+  end
+  
+  def base_damage_guide_mods
+    [@damage_mod]
+  end
+  
+  def pretty_damage_actual
+    "#{@damage_rolls.join("/")} + #{@damage_mod}"
+  end
+  
+  def total_damage
+    @damage_rolls.inject(0){ |a,r| a+r } + @damage_mod
+  end
+  
+  def calculate_damage
+    @damage_rolls = @weapon.damage_roll
   end
 end
 
 class Feat
   def initialize(options)
     @character = options[:character]
+  end
+end
+
+class VitalStrikeFeat < Feat
+  def applies_to
+    [MeleeAttack]
+  end
+  
+  def run(attack)
+    attack.extra_damage_guide_rolls += ["#{attack.weapon.pretty_print_die_roll}[vital strike]"]
+    attack.damage_rolls += attack.weapon.damage_roll
   end
 end
 
@@ -54,20 +86,34 @@ class MeleeAttack < Attack
     @damage_mod = @damage_mod + @character.extra_damage_bonus
     @attack_mod = @attack_mod + @character.extra_attack_bonus
     
-    @character.active_feats.select do |feat|
-      if feat.respond_to? :applies_to and feat.applies_to.include? self.class
+    @character.active_feats.each do |feat|
+      if feat.is_a? PowerAttackFeat
         feat.run(self)
       end
     end
     
     attack_roll = rand(20)
+    
+    if attack_roll == 20
+      critical_attack = self.dup
+    end
+    
     puts ""
     puts "Attacking with #{@weapon.name}"
-    puts "Attack: #{attack_roll + @attack_mod} = (1d20+#{@attack_mod}) = #{attack_roll} + #{@attack_mod}   \tDamage: #{roll_damage(@damage_mod)}"
+    calculate_damage
+    
+    @character.active_feats.each do |feat|
+      if feat.is_a? VitalStrikeFeat
+        feat.run(self)
+      end
+    end
+    
+    puts "Attack: #{attack_roll + @attack_mod} = (1d20+#{@attack_mod}) = #{attack_roll} + #{@attack_mod}   \tDamage: #{pretty_damage}"
     if attack_roll == 20
       puts "Possible Crit, Rolling Secondary:"
       attack_roll = rand(20)
-      puts "Attack: #{attack_roll + @attack_mod} = (1d20+#{@attack_mod}) = #{attack_roll} + #{@attack_mod}   \tDamage: #{roll_damage(@damage_mod)}"
+      critical_attack.calculate_damage
+      puts "Attack: #{attack_roll + critical_attack.attack_mod} = (1d20+#{critical_attack.attack_mod}) = #{attack_roll} + #{critical_attack.attack_mod}   \tDamage: #{critical_attack.pretty_damage}"
     end
     
   end

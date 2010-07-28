@@ -220,7 +220,7 @@ character.active_feats << PowerAttackFeat.new(:character => character) if is_pow
 
 $stdout << "Vital Strike? [y/N]: "
 if $stdin.readline.chomp.downcase == "y"
-  character.active_feats << :vital_strike
+  character.active_feats << VitalStrikeFeat.new(:character => character)
   character.actions.detect {|a| a.name == "standard action attack" }.run
   exit 0
 end
