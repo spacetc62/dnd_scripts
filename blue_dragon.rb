@@ -212,7 +212,7 @@ is_power = $stdin.readline.chomp.downcase == "y"
 
 character.extra_attack_bonus = extra_attack_mod
 character.extra_damage_bonus = extra_damage_mod
-character.active_feats << :power_attack if is_power
+character.active_feats << PowerAttackFeat.new(:character => character) if is_power
 
 
 
