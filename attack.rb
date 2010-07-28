@@ -1,4 +1,5 @@
 class Attack
+  attr_accessor :weapon, :character
   def initialize(options)
     @weapon = options[:weapon]
     @attack_mod = options[:attack_mod]
@@ -21,31 +22,56 @@ class Attack
   end
 end
 
+class PowerAttackFeat
+#   def initialize
+#   end
+  def run(attack)
+    pow_damage_mod = 2 + ( (attack.character.bab / 4.0).floor * 2 )
+    pow_damage_mod = ( pow_damage_mod * attack.weapon.strength_multiplier ).floor
+    power_attack_mod = -1 - (attack.character.bab / 4.0).floor
+    
+#     attack.damage_mod = attack.damage_mod + attack.character.extra_damage_bonus + pow_damage_mod
+#     attack.attack_mod = attack.attack_mod + attack.character.extra_attack_bonus + power_attack_mod
+    attack.damage_mod = attack.damage_mod + pow_damage_mod
+    attack.attack_mod = attack.attack_mod + power_attack_mod
+  end
+end
+
 class MeleeAttack < Attack
+  attr_accessor :damage_mod, :attack_mod, :attack_bonus, :damage_bonus
+#   def initialize(options)
+#     super
+#     @attack_bonus = @character.attack_bonus
+#     @damage_bonus = @character.damage_bonus
+#   end
   def run
     roll_attack
   end
   
   def roll_attack
-    extra_attack_mod = @character.attack_bonus
-    extra_damage_mod = @character.damage_bonus
+#     extra_attack_mod = @character.attack_bonus
+#     extra_damage_mod = @character.damage_bonus
     is_power = @character.active_feats.include?(:power_attack)
 
-    pow_damage_mod = 2 + ( (@character.bab / 4.0).floor * 2 )
-    pow_damage_mod = ( pow_damage_mod * @weapon.strength_multiplier ).floor
-    power_attack_mod = -1 - (@character.bab / 4.0).floor
+#     pow_damage_mod = 2 + ( (@character.bab / 4.0).floor * 2 )
+#     pow_damage_mod = ( pow_damage_mod * @weapon.strength_multiplier ).floor
+#     power_attack_mod = -1 - (@character.bab / 4.0).floor
     
-    damage_mod = @damage_mod + extra_damage_mod + (is_power ? pow_damage_mod : 0)
-    attack_mod = @attack_mod + extra_attack_mod + (is_power ? power_attack_mod : 0)
+#     @damage_mod = @damage_mod + @damage_bonus + (is_power ? pow_damage_mod : 0)
+#     @attack_mod = @attack_mod + @attack_bonus + (is_power ? power_attack_mod : 0)
+    
+    @damage_mod = @damage_mod + @character.extra_damage_bonus
+    @attack_mod = @attack_mod + @character.extra_attack_bonus
+    PowerAttackFeat.new.run(self) if is_power
     
     attack_roll = rand(20)
     puts ""
     puts "Attacking with #{@weapon.name}"
-    puts "Attack: #{attack_roll + attack_mod} = (1d20+#{attack_mod}) = #{attack_roll} + #{attack_mod}   \tDamage: #{roll_damage(damage_mod)}"
+    puts "Attack: #{attack_roll + @attack_mod} = (1d20+#{@attack_mod}) = #{attack_roll} + #{@attack_mod}   \tDamage: #{roll_damage(@damage_mod)}"
     if attack_roll == 20
       puts "Possible Crit, Rolling Secondary:"
       attack_roll = rand(20)
-      puts "Attack: #{attack_roll + attack_mod} = (1d20+#{attack_mod}) = #{attack_roll} + #{attack_mod}   \tDamage: #{roll_damage(damage_mod)}"
+      puts "Attack: #{attack_roll + @attack_mod} = (1d20+#{@attack_mod}) = #{attack_roll} + #{@attack_mod}   \tDamage: #{roll_damage(@damage_mod)}"
     end
     
   end
@@ -84,14 +110,14 @@ class AttackGroup
 end
 
 class Character
-  attr_accessor :actions, :active_feats, :attack_bonus, :damage_bonus, :bab
+  attr_accessor :actions, :active_feats, :extra_attack_bonus, :extra_damage_bonus, :bab
   def initialize(options)
     @name = options[:name]
     @bab = options[:bab]
     @strength = options[:stregth]
     @actions = options[:actions]
-    @attack_bonus = options[:attack_bonus]
-    @damage_bonus = options[:damage_bonus]
+    @extra_attack_bonus = options[:extra_attack_bonus]
+    @extra_damage_bonus = options[:extra_damage_bonus]
     @active_feats = options[:active_feats]
   end
 end

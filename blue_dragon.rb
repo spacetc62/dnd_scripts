@@ -54,6 +54,9 @@ tertiary_damage = (STRENGTH * 0.5).floor + MAGICAL + LEVEL_DAMAGE_MODIFIER
 #   "attack" (standard action) [standard attack?]
 #   so what do we call the lowest level thing? (ie bite) [attack?]
 
+# feats
+#   
+
 character = Character.new({
                             :name         => "Xanion",
                             :bab          => BAB,
@@ -207,8 +210,8 @@ extra_damage_mod = $stdin.readline.chomp.to_i + bard_mod
 $stdout << "Power Attack? [y/N]: "
 is_power = $stdin.readline.chomp.downcase == "y"
 
-character.attack_bonus = extra_attack_mod
-character.damage_bonus = extra_damage_mod
+character.extra_attack_bonus = extra_attack_mod
+character.extra_damage_bonus = extra_damage_mod
 character.active_feats << :power_attack if is_power
 
 
