@@ -8,17 +8,19 @@ def rand(max)
   RAND.rand(max) + 1
 end
 
-BAB = 12
-STRENGTH = 5 - 1 # STR drain
+BAB = 13
+STRENGTH = 5
 MULTIATTACK = 3
 MAGICAL = 2
 BARD = 3
+WEAPON_FOCUS_BITE = 1
 # POWER_ATTACK_MOD = -1 - (BAB/4.0).floor
 
 LEVEL_DAMAGE_MODIFIER = 5
 
-primary_attack = BAB + STRENGTH + MAGICAL
-secondary_attack = BAB - 5 + STRENGTH + MULTIATTACK + MAGICAL
+primary_attack = BAB + STRENGTH + MAGICAL + WEAPON_FOCUS_BITE
+secondary_attack = BAB + STRENGTH + MAGICAL
+tertiary_attack = BAB - 5 + STRENGTH + MULTIATTACK + MAGICAL
 primary_damage = (STRENGTH * 1.5).floor + MAGICAL + LEVEL_DAMAGE_MODIFIER
 secondary_damage = STRENGTH + MAGICAL + LEVEL_DAMAGE_MODIFIER
 tertiary_damage = (STRENGTH * 0.5).floor + MAGICAL + LEVEL_DAMAGE_MODIFIER
@@ -132,23 +134,23 @@ full_action_attack_action =
                                                                         :damage_mod => primary_damage),
                                                         MeleeAttack.new(:character => character,
                                                                         :weapon => claw,
-                                                                        :attack_mod => primary_attack,
+                                                                        :attack_mod => secondary_attack,
                                                                         :damage_mod => secondary_damage),
                                                         MeleeAttack.new(:character => character,
                                                                         :weapon => claw,
-                                                                        :attack_mod => primary_attack,
+                                                                        :attack_mod => secondary_attack,
                                                                         :damage_mod => secondary_damage),
                                                         MeleeAttack.new(:character => character,
                                                                         :weapon => wing,
-                                                                        :attack_mod => secondary_attack,
+                                                                        :attack_mod => tertiary_attack,
                                                                         :damage_mod => tertiary_damage),
                                                         MeleeAttack.new(:character => character,
                                                                         :weapon => wing,
-                                                                        :attack_mod => secondary_attack,
+                                                                        :attack_mod => tertiary_attack,
                                                                         :damage_mod => tertiary_damage),
                                                         MeleeAttack.new(:character => character,
                                                                         :weapon => tail,
-                                                                        :attack_mod => secondary_attack,
+                                                                        :attack_mod => tertiary_attack,
                                                                         :damage_mod => primary_damage),
                                                        ]})
                          ],
