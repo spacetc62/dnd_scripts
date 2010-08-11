@@ -98,8 +98,8 @@ class MeleeAttack < Attack
   end
   
   def roll_attack
-    @damage_mod = @damage_mod + @character.extra_damage_bonus
-    @attack_mod = @attack_mod + @character.extra_attack_bonus
+    @damage_mod = @damage_mod + @character.total_extra_damage_bonus
+    @attack_mod = @attack_mod + @character.total_extra_attack_bonus
     
     @character.active_feats.each do |feat|
       if feat.is_a? PowerAttackFeat or feat.is_a? WeaponFocusFeat
@@ -167,8 +167,16 @@ class AttackGroup
   end
 end
 
+class Amulet
+  attr_accessor :attack_bonus, :damage_bonus
+  def initialize(options)
+    @attack_bonus = options[:attack_bonus]
+    @damage_bonus = options[:damage_bonus]
+  end
+end
+
 class Character
-  attr_accessor :actions, :active_feats, :extra_attack_bonus, :extra_damage_bonus, :bab
+  attr_accessor :actions, :active_feats, :extra_attack_bonus, :extra_damage_bonus, :bab, :equipment
   def initialize(options)
     @name = options[:name]
     @bab = options[:bab]
@@ -176,7 +184,18 @@ class Character
     @actions = options[:actions]
     @extra_attack_bonus = options[:extra_attack_bonus]
     @extra_damage_bonus = options[:extra_damage_bonus]
-    @active_feats = options[:active_feats]
+    @active_feats = options[:active_feats] || []
+    @equipment = options[:equipment] || []
+  end
+  
+  def total_extra_attack_bonus
+    @extra_attack_bonus +
+      @equipment.select {|e| e.respond_to?(:attack_bonus) }.inject(0) {|sum, e| sum + e.attack_bonus }
+  end
+  
+  def total_extra_damage_bonus
+    @extra_damage_bonus +
+      @equipment.select {|e| e.respond_to?(:damage_bonus) }.inject(0) {|sum, e| sum + e.damage_bonus }
   end
 end
 

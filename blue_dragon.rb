@@ -11,7 +11,7 @@ end
 BAB = 13
 STRENGTH = 5
 MULTIATTACK = 3
-MAGICAL = 2
+# MAGICAL = 2
 BARD = 3
 # WEAPON_FOCUS_BITE = 1
 # POWER_ATTACK_MOD = -1 - (BAB/4.0).floor
@@ -25,6 +25,7 @@ primary_damage = (STRENGTH * 1.5).floor + MAGICAL + LEVEL_DAMAGE_MODIFIER
 secondary_damage = STRENGTH + MAGICAL + LEVEL_DAMAGE_MODIFIER
 tertiary_damage = (STRENGTH * 0.5).floor + MAGICAL + LEVEL_DAMAGE_MODIFIER
 
+amulet_of_mighty_fists = Amulet.new({:attack_bonus => 2, :damage_bonus => 2})
 
 # what could an attack consist of?
 #  weapon
@@ -64,6 +65,7 @@ character = Character.new({
                             :bab          => BAB,
                             :strength     => STRENGTH,
                             :active_feats => [],
+                            :equipment    => [amulet_of_mighty_fists],
                           })
 
 character.active_feats << WeaponFocusFeat.new(:character => character, :weapon_type => :bite)
