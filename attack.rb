@@ -121,7 +121,8 @@ end
 
 class SupernaturalAttack < Attack
   def run
-    roll_damage(0, false)
+    calculate_damage
+    pretty_damage
   end
 end
 
@@ -165,12 +166,13 @@ class Character
 end
 
 class Weapon
-  attr_reader :name, :die, :die_count, :strength_multiplier
+  attr_reader :name, :die, :die_count, :strength_multiplier, :weapon_type
   def initialize(options)
     @name = options[:name]
     @die = options[:die]
     @die_count = options[:die_count]
     @strength_multiplier = options[:strength_multiplier] || 1
+    @weapon_type = options[:weapon_type]
   end
   
   def pretty_print_die_roll
