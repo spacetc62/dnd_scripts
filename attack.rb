@@ -60,6 +60,23 @@ class VitalStrikeFeat < Feat
   end
 end
 
+class WeaponFocusFeat < Feat
+  def initialize(options)
+    @weapon_type = options[:weapon_type]
+    super
+  end
+  
+  def applies_to
+    [MeleeAttack]
+  end
+  
+  def run(attack)
+#     attack.extra_damage_guide_rolls += ["#{attack.weapon.pretty_print_die_roll}[vital strike]"]
+#     attack.damage_rolls += attack.weapon.damage_roll
+    attack.attack_mod += 1 if attack.weapon.weapon_type == @weapon_type
+  end
+end
+
 class PowerAttackFeat < Feat
   def applies_to
     [MeleeAttack]
@@ -87,7 +104,7 @@ class MeleeAttack < Attack
     @attack_mod = @attack_mod + @character.extra_attack_bonus
     
     @character.active_feats.each do |feat|
-      if feat.is_a? PowerAttackFeat
+      if feat.is_a? PowerAttackFeat or feat.is_a? WeaponFocusFeat
         feat.run(self)
       end
     end

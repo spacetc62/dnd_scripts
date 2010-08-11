@@ -13,12 +13,12 @@ STRENGTH = 5
 MULTIATTACK = 3
 MAGICAL = 2
 BARD = 3
-WEAPON_FOCUS_BITE = 1
+# WEAPON_FOCUS_BITE = 1
 # POWER_ATTACK_MOD = -1 - (BAB/4.0).floor
 
 LEVEL_DAMAGE_MODIFIER = 5
 
-primary_attack = BAB + STRENGTH + MAGICAL + WEAPON_FOCUS_BITE
+primary_attack = BAB + STRENGTH + MAGICAL # + WEAPON_FOCUS_BITE
 secondary_attack = BAB + STRENGTH + MAGICAL
 tertiary_attack = BAB - 5 + STRENGTH + MULTIATTACK + MAGICAL
 primary_damage = (STRENGTH * 1.5).floor + MAGICAL + LEVEL_DAMAGE_MODIFIER
@@ -66,11 +66,14 @@ character = Character.new({
                             :active_feats => [],
                           })
 
+character.active_feats << WeaponFocusFeat.new(:character => character, :weapon_type => :bite)
+
 teeth = Weapon.new({
                      :name => "Teeth",
                      :die_count => 2,
                      :die => 6,
                      :strength_multiplier => 1.5,
+                     :weapon_type => :bite,
                    })
 
 claw = Weapon.new({
