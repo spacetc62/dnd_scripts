@@ -71,7 +71,7 @@ class WeaponFocusFeat < Feat
   end
   
   def run(attack)
-    attack.attack_mod += 1 if attack.weapon.weapon_type == @weapon_type
+    attack.attack_mod += 1 if attack.weapon.weapon_types.include? @weapon_type
   end
 end
 
@@ -98,8 +98,14 @@ class MeleeAttack < Attack
   end
   
   def roll_attack
-    @damage_mod = @damage_mod + @character.total_extra_damage_bonus
-    @attack_mod = @attack_mod + @character.total_extra_attack_bonus
+    @damage_mod = @damage_mod + @character.extra_damage_bonus
+    @attack_mod = @attack_mod + @character.extra_attack_bonus
+    
+    @character.equipment.each do |item|
+      if item.applies_to.detect {|at| self.is_a? at }
+        item.run(self)
+      end
+    end
     
     @character.active_feats.each do |feat|
       if feat.is_a? PowerAttackFeat or feat.is_a? WeaponFocusFeat
@@ -173,6 +179,15 @@ class Amulet
     @attack_bonus = options[:attack_bonus]
     @damage_bonus = options[:damage_bonus]
   end
+  
+  def applies_to
+    [MeleeAttack]
+  end
+  
+  def run(attack)
+    attack.attack_mod += @attack_bonus
+    attack.damage_mod += @damage_bonus
+  end
 end
 
 class Character
@@ -187,26 +202,16 @@ class Character
     @active_feats = options[:active_feats] || []
     @equipment = options[:equipment] || []
   end
-  
-  def total_extra_attack_bonus
-    @extra_attack_bonus +
-      @equipment.select {|e| e.respond_to?(:attack_bonus) }.inject(0) {|sum, e| sum + e.attack_bonus }
-  end
-  
-  def total_extra_damage_bonus
-    @extra_damage_bonus +
-      @equipment.select {|e| e.respond_to?(:damage_bonus) }.inject(0) {|sum, e| sum + e.damage_bonus }
-  end
 end
 
 class Weapon
-  attr_reader :name, :die, :die_count, :strength_multiplier, :weapon_type
+  attr_reader :name, :die, :die_count, :strength_multiplier, :weapon_types
   def initialize(options)
     @name = options[:name]
     @die = options[:die]
     @die_count = options[:die_count]
     @strength_multiplier = options[:strength_multiplier] || 1
-    @weapon_type = options[:weapon_type]
+    @weapon_types = options[:weapon_types] || []
   end
   
   def pretty_print_die_roll

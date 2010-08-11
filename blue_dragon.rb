@@ -11,19 +11,20 @@ end
 BAB = 13
 STRENGTH = 5
 MULTIATTACK = 3
-# MAGICAL = 2
+# MAGICAL = 2 # only for unarmed and natural weapons
 BARD = 3
 # WEAPON_FOCUS_BITE = 1
 # POWER_ATTACK_MOD = -1 - (BAB/4.0).floor
+BLESS = 1
 
 LEVEL_DAMAGE_MODIFIER = 5
 
-primary_attack = BAB + STRENGTH + MAGICAL # + WEAPON_FOCUS_BITE
-secondary_attack = BAB + STRENGTH + MAGICAL
-tertiary_attack = BAB - 5 + STRENGTH + MULTIATTACK + MAGICAL
-primary_damage = (STRENGTH * 1.5).floor + MAGICAL + LEVEL_DAMAGE_MODIFIER
-secondary_damage = STRENGTH + MAGICAL + LEVEL_DAMAGE_MODIFIER
-tertiary_damage = (STRENGTH * 0.5).floor + MAGICAL + LEVEL_DAMAGE_MODIFIER
+primary_attack = BAB + STRENGTH # + MAGICAL # + WEAPON_FOCUS_BITE
+secondary_attack = BAB + STRENGTH # + MAGICAL
+tertiary_attack = BAB - 5 + STRENGTH + MULTIATTACK # + MAGICAL
+primary_damage = (STRENGTH * 1.5).floor + LEVEL_DAMAGE_MODIFIER # + MAGICAL
+secondary_damage = STRENGTH + LEVEL_DAMAGE_MODIFIER # + MAGICAL
+tertiary_damage = (STRENGTH * 0.5).floor + LEVEL_DAMAGE_MODIFIER # + MAGICAL
 
 amulet_of_mighty_fists = Amulet.new({:attack_bonus => 2, :damage_bonus => 2})
 
@@ -75,13 +76,14 @@ teeth = Weapon.new({
                      :die_count => 2,
                      :die => 6,
                      :strength_multiplier => 1.5,
-                     :weapon_type => :bite,
+                     :weapon_types => [:bite, :natural],
                    })
 
 claw = Weapon.new({
                     :name => "Claw",
                     :die_count => 1,
                     :die => 8,
+                    :weapon_types => [:natural],
                   })
 
 wing = Weapon.new({
@@ -89,6 +91,7 @@ wing = Weapon.new({
                     :die_count => 1,
                     :die => 6,
                     :strength_multiplier => 0.5,
+                    :weapon_types => [:natural],
                   })
 
 tail = Weapon.new({
@@ -96,6 +99,7 @@ tail = Weapon.new({
                     :die_count => 1,
                     :die => 8,
                     :strength_multiplier => 1.5,
+                    :weapon_types => [:natural],
                   })
 
 electricity = Weapon.new({
@@ -219,6 +223,7 @@ is_power = $stdin.readline.chomp.downcase == "y"
 
 character.extra_attack_bonus = extra_attack_mod
 character.extra_damage_bonus = extra_damage_mod
+# character.extra_attack_bonus += BLESS
 character.active_feats << PowerAttackFeat.new(:character => character) if is_power
 
 
