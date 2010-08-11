@@ -71,8 +71,6 @@ class WeaponFocusFeat < Feat
   end
   
   def run(attack)
-#     attack.extra_damage_guide_rolls += ["#{attack.weapon.pretty_print_die_roll}[vital strike]"]
-#     attack.damage_rolls += attack.weapon.damage_roll
     attack.attack_mod += 1 if attack.weapon.weapon_type == @weapon_type
   end
 end
