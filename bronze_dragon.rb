@@ -7,11 +7,11 @@ def rand(max)
   RAND.rand(max) + 1
 end
 
-BAB = 10
-STRENGTH = 5
+BAB = 13
+STRENGTH = 6
 MULTIATTACK = 3
 MAGICAL = 2
-BARD = 2
+BARD = 3
 POWER_ATTACK_MOD = -1 - (BAB/4.0).floor
 
 primary_attack = BAB + STRENGTH + MAGICAL
@@ -28,48 +28,48 @@ attacks = [
              :attack_mod => primary_attack,
              :damage_mod => primary_damage,
              :damage_roll => [6,6],
-             :pow_damage_mod => 9
+             :pow_damage_mod => 12
            },
            { 
              :name => "Claw 1",
              :attack_mod => primary_attack,
              :damage_mod => secondary_damage,
              :damage_roll => [8],
-             :pow_damage_mod => 6
+             :pow_damage_mod => 8
            },
            { 
              :name => "Claw 2",
              :attack_mod => primary_attack,
              :damage_mod => secondary_damage,
              :damage_roll => [8],
-             :pow_damage_mod => 6
+             :pow_damage_mod => 8
            },
            { 
              :name => "Wing 1",
              :attack_mod => secondary_attack,
              :damage_mod => tertiary_damage,
              :damage_roll => [6],
-             :pow_damage_mod => 3
+             :pow_damage_mod => 4
            },
            { 
              :name => "Wing 2",
              :attack_mod => secondary_attack,
              :damage_mod => tertiary_damage,
              :damage_roll => [6],
-             :pow_damage_mod => 3
+             :pow_damage_mod => 4
            },
            { 
              :name => "Tail",
              :attack_mod => secondary_attack,
              :damage_mod => primary_damage,
              :damage_roll => [8],
-             :pow_damage_mod => 6
+             :pow_damage_mod => 8
            },
            {
              :name => "Electrcity",
              :attack_mod => 0,
              :damage_mod => 0,
-             :damage_roll => [6,6,6,6,6,6],
+             :damage_roll => [6,6,6,6,6,6,6,6],
              :pow_damage_mod => 0
            }
           ]
@@ -77,6 +77,7 @@ attacks = [
 def roll_damage(attack, damage_modifier, is_vital)
   rolls = attack[:damage_roll].map{ |die| rand(die) }
   rolls += attack[:damage_roll].map{ |die| rand(die) } if is_vital
+  rolls += attack[:damage_roll].map{ |die| rand(die) } if is_vital #Improved vital strike
   total = rolls.inject(0){ |a,r| a+r } + damage_modifier
   
   rolls.join("/") + " -> #{total}"
