@@ -116,6 +116,7 @@ extra_damage_mod = $stdin.readline.chomp.to_i + bard_mod
 $stdout << "Power Attack? [y/N]: "
 is_power = $stdin.readline.chomp.downcase == "y"
 
+
 $stdout << "Vital Strike? [y/N]: "
 if $stdin.readline.chomp.downcase == "y"
   roll_attack(attacks[0], extra_attack_mod, extra_damage_mod, is_power, true)
